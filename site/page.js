@@ -1,9 +1,14 @@
 /* Kit Permanence · formulaire de contact et guide d'urgence */
-document.getElementById('cform').addEventListener('submit',function(e){
-  e.preventDefault();var f=e.target;
-  fetch('/',{method:'POST',body:new FormData(f)})
-   .then(function(r){if(!r.ok)throw 0;f.querySelectorAll('input,textarea,button').forEach(function(x){x.disabled=true});document.getElementById('c-ok').style.display='block'})
-   .catch(function(){f.submit()});
+document.getElementById('cform').addEventListener('submit',async function(e){
+  e.preventDefault();var f=e.target,btn=f.querySelector('button[type=submit]'),err=document.getElementById('c-err');
+  if(f.elements['bot-field'].value)return;
+  btn.disabled=true;btn.textContent='Envoi en cours…';err.style.display='none';
+  var file=f.elements.photo.files[0],photo=null;
+  if(file){try{photo=(await window.paCompress(file)).blob}catch(x){photo=null}}
+  var d={nom:f.elements.nom.value.trim(),telephone:f.elements.telephone.value.trim(),commune:f.elements.commune.value.trim(),message:f.elements.message.value.trim(),urgence:/urgen|fuite|inond|d[ée]g[âa]t/i.test(f.elements.message.value)?'URGENT':'normale'};
+  var ok=window.paSend?await window.paSend('contact',d,photo):false;
+  if(ok){f.querySelectorAll('input,textarea,button').forEach(function(x){x.disabled=true});btn.textContent='Demande envoyée';document.getElementById('c-ok').style.display='block'}
+  else{btn.disabled=false;btn.textContent='Envoyer ma demande';err.style.display='block'}
 });
 document.getElementById('c-photo').addEventListener('change',function(){var f=this.files[0];document.getElementById('c-photo-l').textContent=f?('Photo ajoutée : '+f.name):'Ajouter une photo du problème (facultatif)';if(f&&f.size>7.5e6){this.value='';document.getElementById('c-photo-l').textContent='Photo trop lourde (8 Mo max) : choisissez-en une plus légère.'}});
 /* onglets du guide d'urgence */

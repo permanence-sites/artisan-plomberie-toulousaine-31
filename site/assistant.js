@@ -79,6 +79,13 @@ panel.innerHTML=`<div class="pa-h"><span class="av">${avImg}</span><div class="t
 document.body.append(fab,panel);
 const $m=panel.querySelector('.pa-m'),$c=panel.querySelector('.pa-c'),$i=panel.querySelector('input[type=text]'),$file=panel.querySelector('input[type=file]'),$prog=[...panel.querySelectorAll('.pa-prog i')];
 let started=false,tease=null;
+/* envoi direct au webhook (Make) : même structure que l'ancien envoi Netlify (data.*), photo en base64, 2 essais */
+function b64(blob){return new Promise(r=>{if(!blob)return r(null);const fr=new FileReader();fr.onload=()=>r(String(fr.result).split(',')[1]||null);fr.onerror=()=>r(null);fr.readAsDataURL(blob)})}
+async function paSend(form,data,photo){if(!S.endpoint)return false;
+  const body=JSON.stringify({form_name:form,site_url:location.origin,created_at:new Date().toISOString(),data:Object.assign({},data,{photo:photo?'jointe':''}),photo_b64:await b64(photo),photo_name:photo?'photo-probleme.jpg':''});
+  for(let i=0;i<2;i++){try{const r=await fetch(S.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:body.length<60000});if(r.ok)return true}catch(e){}await new Promise(r=>setTimeout(r,1200))}
+  return false}
+window.paSend=paSend;window.paCompress=f=>compress(f);
 const ss={get(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
 function open(opts){hideTease();ss.set('pa-seen','1');panel.classList.add('open');fab.setAttribute('aria-expanded','true');
   if(!started){started=true;if(opts&&opts.photo){photoFirst()}else hello()}else if(opts&&opts.photo){$file.click()}
@@ -151,10 +158,8 @@ panel.querySelector('.cam').addEventListener('click',()=>$file.click());
 
 function summary(){return `${lead.urgent?'URGENT · ':''}Demande via le site\nProblème : ${lead.type||'à préciser'}${lead.detail?' ('+lead.detail+')':''}\nCommune : ${lead.ville?cap(lead.ville):'?'}\nNom : ${lead.nom}\nTéléphone : ${lead.tel}\nCréneau : ${lead.creneau}${lead.photo?'\nPhoto : jointe à la demande':''}`}
 function finish(){
-  const fd=new FormData();
-  Object.entries({'form-name':'demande',urgence:lead.urgent?'URGENT':'normale',probleme:(lead.type||'à préciser')+(lead.detail?' · '+lead.detail:''),commune:lead.ville?cap(lead.ville):'',nom:lead.nom,telephone:lead.tel,creneau:lead.creneau,resume:summary(),'bot-field':''}).forEach(([k,v])=>fd.append(k,v));
-  if(lead.photo)fd.append('photo',lead.photo,'photo-probleme.jpg');
-  fetch('/',{method:'POST',body:fd}).catch(()=>{});
+  paSend('demande',{urgence:lead.urgent?'URGENT':'normale',probleme:(lead.type||'à préciser')+(lead.detail?' · '+lead.detail:''),commune:lead.ville?cap(lead.ville):'',nom:lead.nom,telephone:lead.tel,creneau:lead.creneau,resume:summary()},lead.photo)
+    .then(ok=>{if(!ok)say([{h:`Petit souci de connexion : votre demande n'est peut-être pas partie. Pour être sûr, appelez le <a href="tel:${TEL}">${PHONE}</a> ou envoyez le récapitulatif sur WhatsApp ci-dessus.`,c:'warn'}])});
   const wa='https://wa.me/'+WA+'?text='+encodeURIComponent('Bonjour, '+summary());
   const card={c:'bare',h:`<div class="pa-card"><b>Récapitulatif envoyé</b>${esc(summary()).replace(/\n/g,'<br>')}</div>`};
   say([`Merci ${esc(lead.nom.split(' ')[0])}, c'est noté : votre demande est transmise à ${OWNER}${lead.urgent?' <b>en priorité</b>':''}. Il vous rappelle ${lead.urgent?'au plus vite':'pour convenir du rendez-vous'}.`,
@@ -165,6 +170,19 @@ function finish(){
 function gas(){lead.type='Odeur de gaz';lead.urgent=true;step=null;
   return say([{h:`<b>Odeur de gaz : votre sécurité d'abord.</b>\n1. Ouvrez portes et fenêtres.\n2. Ne touchez à aucun interrupteur, appareil électrique ni sonnette.\n3. Fermez le robinet de gaz si vous le pouvez.\n4. Sortez du logement.\n5. Depuis l'extérieur, appelez Urgence Sécurité Gaz (GRDF), gratuit 24h/24 : <a href="tel:${GAS_TEL}">${GAS}</a>.`,c:'warn'},
     `Une fois la situation sécurisée, ${OWNER} peut intervenir sur l'installation. Voulez-vous que je lui transmette une demande ?`],[{t:'Oui, prévenir l\'artisan',p:1,act:()=>{add('Oui, prévenir l\'artisan','me');lead.detail='après sécurisation';ask()}},{t:'Non merci'}])}
+/* extraction « en vrac » : le client répond souvent à côté de la question (« je suis à Tournefeuille », « mes WC sont bouchés »…).
+   On range chaque info dans la bonne case avant d'avancer. */
+const TEL_RE=/(?:\+33\s?|0)[1-9](?:[\s.\-]?\d{2}){4}/;
+const URG_RE=/urgen|au plus vite|tout de suite|maintenant|vite svp|inond/;
+const PROB_RE=/fuite|inond|degat|goutte|coule|fuit|chauffe|ballon|eau chaude|cumulus|chaudiere|bouch|evier|douche|wc|toilette|canalisation|engorg|clim|salle de bain|renov|robinet|mitigeur|panne|probleme|souci|casse|bruit|odeur|refoul|evacu/;
+function placeIn(raw){const m=raw.match(/(?:^|\s)(?:a|à|sur|vers|de|depuis|j'habite|j’habite|habite|suis a|suis à)\s+([A-ZÀ-Ýa-zà-ÿ][\wÀ-ÿ'’\- ]{1,38})$/i);return m?m[1].trim():null}
+function looksLikeName(raw){const t=raw.trim();return t.length>=2&&t.length<=40&&!/\d/.test(t)&&t.split(/\s+/).length<=4&&!PROB_RE.test(norm(t))&&!/^(je|j'|j’|mon|ma|mes|il|elle|c'est|c’est|bonjour|oui|non)\b/i.test(t)}
+function harvest(raw,s){const got=[];
+  const tm=raw.match(TEL_RE);if(tm&&!lead.tel){lead.tel=tm[0].trim();got.push('tel')}
+  const v=detectVille(s);if(v&&!lead.ville){lead.ville=v;got.push('ville')}
+  const t=detectType(s);if(t&&t!=='GAZ'&&!lead.type){lead.type=t;if(t==='Fuite d\'eau')lead.urgent=true;got.push('type')}
+  if(URG_RE.test(s))lead.urgent=true;
+  return got}
 function reply(raw){
   const s=norm(raw);
   if(/nouvelle demande/.test(s)&&step==='done'){Object.assign(lead,{type:null,urgent:false,ville:null,nom:null,tel:null,creneau:null,detail:null,photo:null,photoAsked:false});step=null;lastWho=null;$m.innerHTML='';return hello()}
@@ -172,12 +190,28 @@ function reply(raw){
   if(step==='photo'||/sans photo/.test(s)){if(step==='photo')step=null;return ask()}
   if(/decrire plutot|^autre chose$/.test(s)){step='detail';return say(['Je vous écoute : décrivez le problème en quelques mots.'])}
   if(/^non merci/.test(s)){step='done';return say(['D\'accord. Prenez soin de vous, et revenez vers moi quand vous voulez.'],[{t:'Nouvelle demande'}])}
-  if(step==='ville'){const v=detectVille(s);lead.ville=v||raw.trim().slice(0,40);
-    return ask(v?[]:[`Je transmets à ${OWNER} : il intervient surtout à ${ZONE_LABEL}. Il vous confirmera s'il peut se déplacer jusqu'à ${esc(cap(raw.trim().slice(0,40)))}.`])}
-  if(step==='nom'){lead.nom=cap(raw.trim().slice(0,40));return ask()}
-  if(step==='tel'){const d=raw.replace(/[^\d+]/g,'');if(d.replace('+','').length<9)return say(['Je n\'ai pas reconnu le numéro, pouvez-vous le réécrire ? (ex. 06 12 34 56 78)']);lead.tel=raw.trim().slice(0,25);return ask()}
-  if(step==='creneau'){lead.creneau=raw.trim().slice(0,60);return ask()}
-  if(step==='detail'){const t=detectType(s);if(t&&!lead.type){lead.type=t;if(t==='Fuite d\'eau')lead.urgent=true}lead.detail=raw.trim().slice(0,80);
+  if(step==='ville'){const v=detectVille(s);
+    if(v){lead.ville=v;harvest(raw,s);return ask()}
+    if(PROB_RE.test(s)||raw.trim().split(/\s+/).length>5){const pt=detectType(s);if(pt&&!lead.type)lead.type=pt;if(pt==='Fuite d\'eau')lead.urgent=true;
+      lead.detail=((lead.detail&&!/^(bonjour|salut)/i.test(lead.detail)?lead.detail+' · ':'')+raw.trim()).slice(0,140);harvest(raw,s);
+      const pl=placeIn(raw);if(pl&&!lead.ville){lead.ville=pl;return ask(['Bien noté.'])}
+      return ask(['Bien noté, je transmets ce détail.'])}
+    const pl=placeIn(raw)||raw.trim().slice(0,40);lead.ville=pl;
+    return ask([`Je transmets à ${OWNER} : il intervient surtout à ${ZONE_LABEL}. Il vous confirmera s'il peut se déplacer jusqu'à ${esc(cap(pl))}.`])}
+  if(step==='nom'){const got=harvest(raw,s);
+    if(!looksLikeName(raw)){
+      if(got.includes('ville')||placeIn(raw)){if(!lead.ville)lead.ville=placeIn(raw);return ask(['Merci, j\'ai noté la commune.'])}
+      if(got.length||PROB_RE.test(s)){if(!got.includes('type'))lead.detail=((lead.detail?lead.detail+' · ':'')+raw.trim()).slice(0,140);return ask(['Bien noté.'])}
+      if(raw.trim().length>40)return say(['Merci. Et à quel nom je note la demande ? (votre nom suffit)'])}
+    lead.nom=cap(raw.trim().replace(/^(je m'appelle|je m’appelle|moi c'est|moi c’est|c'est|c’est|nom\s*:)\s*/i,'').slice(0,40));return ask()}
+  if(step==='tel'){const tm=raw.match(TEL_RE);const d=raw.replace(/[^\d+]/g,'');
+    if(!tm&&d.replace('+','').length<9){harvest(raw,s);return say(['Je n\'ai pas reconnu le numéro, pouvez-vous le réécrire ? (ex. 06 12 34 56 78)'])}
+    lead.tel=(tm?tm[0]:raw).trim().slice(0,25);return ask()}
+  if(step==='creneau'){if(URG_RE.test(s))lead.urgent=true;lead.creneau=raw.trim().slice(0,60);return ask()}
+  if(step==='detail'){const t=detectType(s);harvest(raw,s);
+    if(!t&&!lead.type&&!PROB_RE.test(s)&&raw.trim().length<40&&/bonjour|salut|bonsoir|aide|urgen|besoin|plombier/.test(s)){
+      return say([lead.urgent?'Je comprends, je vais faire au plus vite. Que se passe-t-il exactement ? (ex. fuite, WC bouché, plus d\'eau chaude)':'Je vous écoute : que se passe-t-il exactement ?'],[{t:'Une fuite',u:1},{t:'C\'est bouché'},{t:'Plus d\'eau chaude'},PHOTO_CHIP])}
+    if(t&&!lead.type){lead.type=t;if(t==='Fuite d\'eau')lead.urgent=true}lead.detail=raw.trim().slice(0,80);
     return ask(lead.urgent&&t==='Fuite d\'eau'?['En attendant : <b>coupez l\'arrivée d\'eau</b> (robinet général, souvent près du compteur). Je signale votre demande <b>en urgence</b>.']:[])}
   if(step==='done')return say([`Votre demande est déjà transmise à ${OWNER}. Pour une autre demande, touchez « Nouvelle demande ».`],[{t:'Nouvelle demande'}]);
   if(/prix|tarif|combien|cout|cher/.test(s))
@@ -189,13 +223,16 @@ function reply(raw){
     return say([v?`Oui, ${esc(cap(v))} fait partie de la zone d'intervention de ${OWNER} 👍`:`${OCAP} intervient à ${ZONE_LABEL}.`,'Quel est votre besoin ?'],START.filter(c=>!/^Vous passez/.test(c.t)))}
   if(/bonjour|salut|bonsoir|hello/.test(s)&&s.length<20)return say([`Bonjour ! Dites-moi ce qui se passe, je m'occupe de transmettre à ${OWNER}.`],START);
   const t=detectType(s);
-  if(t){lead.type=t;const v=detectVille(s);if(v)lead.ville=v;
+  if(t){lead.type=t;harvest(raw,s);
     if(t==='Fuite d\'eau'){lead.urgent=true;step=null;
       return ask(['D\'accord, on s\'en occupe. En attendant : <b>coupez l\'arrivée d\'eau</b> (robinet général, souvent près du compteur) et, si l\'eau approche d\'une prise, coupez l\'électricité de la pièce.',`Je signale votre demande <b>en urgence</b> à ${OWNER}.`])}
     step='detail';
     if(t==='Chauffe-eau / eau chaude')return say([`Compris, plus d'eau chaude, c'est vite pénible. ${OCAP} dépanne et remplace les chauffe-eau.`,'Il est électrique ou au gaz ? Et plutôt panne totale, ou eau tiède ?'],[{t:'Électrique, plus rien'},{t:'Électrique, eau tiède'},{t:'Gaz'},{t:'Je ne sais pas'}]);
     if(t==='Rénovation salle de bain')return say([`Avec plaisir : ${OWNER} rénove les salles de bain, y compris les douches à l'italienne.`,'Qu\'aimeriez-vous faire, en quelques mots ?'],[{t:'Remplacer la baignoire par une douche'},{t:'Rénovation complète'},{t:'Changer meuble et robinetterie'}]);
     return say(['Je vois. Pouvez-vous préciser en quelques mots (pièce concernée, depuis quand) ?'])}
+  harvest(raw,s);
+  if(!PROB_RE.test(s)&&raw.trim().length<40&&/bonjour|salut|bonsoir|aide|urgen|besoin|plombier|svp|s'il vous/.test(s)){step='detail';
+    return say([lead.urgent?'Je comprends, on s\'en occupe en priorité. Que se passe-t-il exactement ?':'Je vous écoute : que se passe-t-il exactement ?'],[{t:'Une fuite',u:1},{t:'C\'est bouché'},{t:'Plus d\'eau chaude'},PHOTO_CHIP])}
   lead.detail=raw.trim().slice(0,80);
   return ask([`Je note : « ${esc(raw.trim().slice(0,80))} ». ${OCAP} verra le détail avec vous.`]);
 }
