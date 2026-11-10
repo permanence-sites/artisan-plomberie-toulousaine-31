@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://artisanplomberietoulousaine31.fr/sitemap.xml
