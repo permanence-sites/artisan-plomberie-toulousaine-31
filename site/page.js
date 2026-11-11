@@ -21,7 +21,7 @@ document.querySelectorAll('[data-swipe]').forEach(function(el){var n=el.children
  function up(){var max=el.scrollWidth-el.clientWidth,k=max>0?Math.round(el.scrollLeft/max*(n-1)):0;for(var i=0;i<n;i++)d.children[i].classList.toggle('on',i===k)}
  el.addEventListener('scroll',function(){requestAnimationFrame(up)},{passive:true});up()});
 document.querySelectorAll('[data-vcard]').forEach(function(b){b.addEventListener('click',function(){
- var v=['BEGIN:VCARD','VERSION:3.0','N:;'+S.brand+';;;','FN:'+S.brand,'ORG:'+S.brand,'TITLE:'+S.trade+' · urgences 7j/7','TEL;TYPE=CELL,VOICE:'+S.phone_intl,S.addr?'ADR;TYPE=WORK:;;'+S.addr:'','URL:'+location.origin+'/','NOTE:Plombier à '+S.city+' · 24h/24 et 7j/7','END:VCARD'].filter(Boolean).join('\r\n');
+ var v=['BEGIN:VCARD','VERSION:3.0','N:;'+S.brand+';;;','FN:'+S.brand,'ORG:'+S.brand,'TITLE:'+S.trade+' · urgences 7j/7','TEL;TYPE=CELL,VOICE:'+S.phone_intl,S.phone2?'TEL;TYPE=WORK,VOICE:'+S.phone2.intl:'',S.addr?'ADR;TYPE=WORK:;;'+S.addr:'','URL:'+location.origin+'/','NOTE:Plombier à '+S.city+' · 24h/24 et 7j/7','END:VCARD'].filter(Boolean).join('\r\n');
  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([v],{type:'text/vcard;charset=utf-8'}));a.download=(S.brand||'contact').replace(/[^\w]+/g,'-')+'.vcf';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500)})});
 document.querySelectorAll('[data-share]').forEach(function(b){b.addEventListener('click',function(){var url=location.origin+'/',txt=S.brand+' : plombier à '+S.city+', 7j/7. '+S.phone;
  if(navigator.share){navigator.share({title:S.brand,text:txt,url:url}).catch(function(){})}

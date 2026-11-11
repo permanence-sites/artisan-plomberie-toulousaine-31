@@ -173,7 +173,7 @@ function finish(){
        card,
        ...(estimate(lead.type)?[`À titre indicatif, voici les prix pratiqués pour ce type d'intervention. Le prix exact sera fixé par un devis écrit et gratuit, avant toute intervention.`,{c:'bare',h:priceCard(estimate(lead.type),true)}]:[]),
        `Pour aller encore plus vite, vous pouvez aussi lui envoyer ce récapitulatif sur WhatsApp : <a href="${wa}" target="_blank" rel="noopener">envoyer sur WhatsApp</a>.`,
-       `En cas d'urgence, appelez directement le <a href="tel:${TEL}">${PHONE}</a>.`],[{t:'Nouvelle demande'}]);
+       `En cas d'urgence, appelez directement le <a href="tel:${TEL}">${PHONE}</a>${S.phone2?`. S'il ne répond pas, son ${S.phone2.label} prend le relais au <a href="tel:${S.phone2.intl}">${S.phone2.phone}</a>`:''}.`],[{t:'Nouvelle demande'}]);
 }
 function gas(){lead.type='Odeur de gaz';lead.urgent=true;step=null;
   return say([{h:`<b>Odeur de gaz : votre sécurité d'abord.</b>\n1. Ouvrez portes et fenêtres.\n2. Ne touchez à aucun interrupteur, appareil électrique ni sonnette.\n3. Fermez le robinet de gaz si vous le pouvez.\n4. Sortez du logement.\n5. Depuis l'extérieur, appelez Urgence Sécurité Gaz (GRDF), gratuit 24h/24 : <a href="tel:${GAS_TEL}">${GAS}</a>.`,c:'warn'},
