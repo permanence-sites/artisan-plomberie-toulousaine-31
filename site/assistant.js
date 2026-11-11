@@ -120,7 +120,14 @@ function say(lines,chips){const g=++gen;let t=0;$c.innerHTML='';
 function setChips(list){$c.innerHTML='';(list||[]).forEach(c=>{const b=document.createElement('button');b.type='button';b.className='pa-chip'+(c.u?' urg':'')+(c.p?' pri':'');b.textContent=c.t;b.onclick=()=>c.act?c.act():send(c.t);$c.appendChild(b)});requestAnimationFrame(()=>{$m.scrollTop=$m.scrollHeight})}
 const Z4=(S.zones||[]).slice(0,4).map(t=>({t}));
 const PHOTO_CHIP={t:'📷 Envoyer une photo',act:()=>$file.click()};
-const START=[{t:'Fuite d\'eau, c\'est urgent',u:1},PHOTO_CHIP,{t:'Mon chauffe-eau ne chauffe plus'},{t:'Devis salle de bain'},{t:'Vous passez à '+((S.zones||[])[2]||S.city)+' ?'},{t:'C\'est combien ?'}];
+const START=[{t:'Fuite d\'eau, c\'est urgent',u:1},PHOTO_CHIP,{t:'Mon chauffe-eau ne chauffe plus'},{t:'Devis salle de bain'},{t:'Vous passez à '+((S.zones||[])[2]||S.city)+' ?'},{t:'Quels sont vos prix ?'}];
+/* fourchettes de prix (grille publiée de l'artisan) */
+const TF=S.tarifs||null;
+const TMAP={'Débouchage / évacuation':'bouche',"Fuite d'eau":'fuite','Chauffe-eau / eau chaude':'chauffe','Installation / robinetterie':'robinet'};
+function estimate(type){if(!TF)return null;const k=TMAP[type]||null;const it=k?TF.items.filter(i=>i.k===k):[];return it.length?it:null}
+function priceCard(items,withBase){const rows=items.map(i=>`<div style="display:flex;justify-content:space-between;gap:12px"><span>${esc(i.t)}</span><strong style="white-space:nowrap">${esc(i.p)}</strong></div>`).join('');
+  const dep=withBase&&TF?TF.base.filter(b=>/placement/.test(b.t)).map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;color:var(--ink-2)"><span>${esc(b.t)}</span><span style="white-space:nowrap">${esc(b.p)}</span></div>`).join(''):'';
+  return `<div class="pa-card"><b>Prix indicatifs TTC</b>${rows}${dep}</div>`}
 function detectType(s){
   if(/gaz/.test(s)&&/odeur|sent|fuite|ca sent/.test(s))return'GAZ';
   if(/fuite|inond|degat|goutte|coule|eau partout|fuit/.test(s))return'Fuite d\'eau';
@@ -162,8 +169,9 @@ function finish(){
     .then(ok=>{if(!ok)say([{h:`Petit souci de connexion : votre demande n'est peut-être pas partie. Pour être sûr, appelez le <a href="tel:${TEL}">${PHONE}</a> ou envoyez le récapitulatif sur WhatsApp ci-dessus.`,c:'warn'}])});
   const wa='https://wa.me/'+WA+'?text='+encodeURIComponent('Bonjour, '+summary());
   const card={c:'bare',h:`<div class="pa-card"><b>Récapitulatif envoyé</b>${esc(summary()).replace(/\n/g,'<br>')}</div>`};
-  say([`Merci ${esc(lead.nom.split(' ')[0])}, c'est noté : votre demande est transmise à ${OWNER}${lead.urgent?' <b>en priorité</b>':''}. Il vous rappelle ${lead.urgent?'au plus vite':'pour convenir du rendez-vous'}.`,
+  say([`Merci ${esc(lead.nom.split(' ')[0])}, c'est noté : votre demande est transmise à ${OWNER}${lead.urgent?' <b>en priorité</b>':''}. Il vous rappelle ${S.rappel?'<b>'+S.rappel+'</b>':(lead.urgent?'au plus vite':'pour convenir du rendez-vous')}.`,
        card,
+       ...(estimate(lead.type)?[`À titre indicatif, voici les prix pratiqués pour ce type d'intervention. Le prix exact sera fixé par un devis écrit et gratuit, avant toute intervention.`,{c:'bare',h:priceCard(estimate(lead.type),true)}]:[]),
        `Pour aller encore plus vite, vous pouvez aussi lui envoyer ce récapitulatif sur WhatsApp : <a href="${wa}" target="_blank" rel="noopener">envoyer sur WhatsApp</a>.`,
        `En cas d'urgence, appelez directement le <a href="tel:${TEL}">${PHONE}</a>.`],[{t:'Nouvelle demande'}]);
 }
@@ -187,6 +195,8 @@ function reply(raw){
   const s=norm(raw);
   if(/nouvelle demande/.test(s)&&step==='done'){Object.assign(lead,{type:null,urgent:false,ville:null,nom:null,tel:null,creneau:null,detail:null,photo:null,photoAsked:false});step=null;lastWho=null;$m.innerHTML='';return hello()}
   if(detectType(s)==='GAZ')return gas();
+  if(TF&&step&&!['done','detail','photo'].includes(step)&&/prix|tarif|combien|cout|cher/.test(s)){const q=nextQ();const est=estimate(lead.type);
+    return say([`Bonne question : voici les prix pratiqués${est?' pour ce type d\'intervention':''}. Le prix exact est fixé par un devis écrit et gratuit, avant toute intervention.`,{c:'bare',h:priceCard(est||TF.items.slice(0,5),true)}].concat(q?[q.t]:[]),q&&q.c)}
   if(step==='photo'||/sans photo/.test(s)){if(step==='photo')step=null;return ask()}
   if(/decrire plutot|^autre chose$/.test(s)){step='detail';return say(['Je vous écoute : décrivez le problème en quelques mots.'])}
   if(/^non merci/.test(s)){step='done';return say(['D\'accord. Prenez soin de vous, et revenez vers moi quand vous voulez.'],[{t:'Nouvelle demande'}])}
@@ -209,13 +219,15 @@ function reply(raw){
     lead.tel=(tm?tm[0]:raw).trim().slice(0,25);return ask()}
   if(step==='creneau'){if(URG_RE.test(s))lead.urgent=true;lead.creneau=raw.trim().slice(0,60);return ask()}
   if(step==='detail'){const t=detectType(s);harvest(raw,s);
+    if(lead.type&&!t&&!PROB_RE.test(s)&&raw.trim().split(/\s+/).length<=4&&(detectVille(s)||placeIn(raw))){if(!lead.ville)lead.ville=detectVille(s)||placeIn(raw);return ask()}
     if(!t&&!lead.type&&!PROB_RE.test(s)&&raw.trim().length<40&&/bonjour|salut|bonsoir|aide|urgen|besoin|plombier/.test(s)){
       return say([lead.urgent?'Je comprends, je vais faire au plus vite. Que se passe-t-il exactement ? (ex. fuite, WC bouché, plus d\'eau chaude)':'Je vous écoute : que se passe-t-il exactement ?'],[{t:'Une fuite',u:1},{t:'C\'est bouché'},{t:'Plus d\'eau chaude'},PHOTO_CHIP])}
     if(t&&!lead.type){lead.type=t;if(t==='Fuite d\'eau')lead.urgent=true}lead.detail=raw.trim().slice(0,80);
     return ask(lead.urgent&&t==='Fuite d\'eau'?['En attendant : <b>coupez l\'arrivée d\'eau</b> (robinet général, souvent près du compteur). Je signale votre demande <b>en urgence</b>.']:[])}
   if(step==='done')return say([`Votre demande est déjà transmise à ${OWNER}. Pour une autre demande, touchez « Nouvelle demande ».`],[{t:'Nouvelle demande'}]);
-  if(/prix|tarif|combien|cout|cher/.test(s))
-    return say([`${OCAP} ne donne pas de prix sans avoir vu le problème : le diagnostic est clair et le devis gratuit, sans frais cachés.`,'Astuce : envoyez une photo du problème, il pourra souvent vous donner une première idée plus vite.'],[PHOTO_CHIP,...START.slice(2,4)]);
+  if(/prix|tarif|combien|cout|cher|devis/.test(s)){const t=detectType(s)||lead.type;
+    if(TF){const est=estimate(t);return say([est?`Voici les prix pratiqués par ${OWNER} pour ce type d'intervention :`:`Voici les principaux prix pratiqués par ${OWNER} :`,{c:'bare',h:priceCard(est||TF.items.slice(0,5),true)},`Le prix exact est fixé par un <b>devis écrit et gratuit</b>, avant toute intervention. Tous les tarifs : <a href="#tarifs">rubrique Tarifs</a>.`,'Décrivez-moi votre problème et je transmets votre demande.'],START.filter(c=>!/prix/.test(c.t)))}
+    return say([`${OCAP} vous donne un prix clair avant d'intervenir, avec un devis gratuit.`],[PHOTO_CHIP,...START.slice(2,4)])}
   if(/horaire|ouvert|dimanche|week|nuit|soir|ferie|7j/.test(s)&&!detectType(s))
     return say([`${OCAP} intervient 7 jours sur 7, en général en moins de 24 h à ${S.city} et alentours.`,'Pour une urgence, je transmets votre demande en priorité.'],START.slice(0,3));
   if(/passez|intervenez|venez|deplac|secteur|zone|commune|ville/.test(s)||(detectVille(s)&&!detectType(s))){

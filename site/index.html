@@ -255,8 +255,25 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-bet
 .bava{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:none;margin:-6px 2px -6px -8px;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #22A55B}
 .btn.write{display:inline-flex;align-items:center;gap:10px}
 .mbar .m-ava .bava{width:26px;height:26px;margin:0;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #22A55B}
-@media (max-width:760px){.contact .ctas{display:grid;grid-template-columns:1fr 1fr;gap:10px}.contact .ctas .btn{justify-content:center;width:100%;padding-inline:10px;font-size:15.5px}}</style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Plumber", "name": "Artisan Plomberie Toulousaine 31", "url": "https://artisanplomberietoulousaine31.fr/", "telephone": "+33643024389", "address": {"@type": "PostalAddress", "streetAddress": "79 avenue de la Gloire", "postalCode": "31500", "addressLocality": "Toulouse", "addressRegion": "Occitanie", "addressCountry": "FR"}, "hasMap": "https://www.google.com/maps/search/?api=1&query=Artisan%20Plomberie%20Toulousaine%2031%2C%2079%20avenue%20de%20la%20Gloire%2C%2031500%20Toulouse", "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "00:00", "closes": "23:59"}], "areaServed": [{"@type": "City", "name": "Toulouse"}, {"@type": "City", "name": "Balma"}, {"@type": "City", "name": "Blagnac"}, {"@type": "City", "name": "Tournefeuille"}, {"@type": "City", "name": "Ramonville-Saint-Agne"}, {"@type": "City", "name": "Cugnaux"}, {"@type": "City", "name": "Colomiers"}, {"@type": "City", "name": "L'Union"}, {"@type": "City", "name": "Saint-Orens"}], "sameAs": ["https://www.google.com/maps/search/?api=1&query=Artisan+Plomberie+Toulousaine+31&query_place_id=ChIJr3PrSh-7rhIRdEAPcxoRuCQ", "https://www.instagram.com/plomberie5723/", "https://www.tiktok.com/@artisanplomberie31", "https://www.facebook.com/people/Artisan-Plombier/100009741544636/"], "logo": "https://artisanplomberietoulousaine31.fr/icon-512.png", "image": "https://artisanplomberietoulousaine31.fr/logo-full.jpg"}</script>
+@media (max-width:760px){.contact .ctas{display:grid;grid-template-columns:1fr 1fr;gap:10px}.contact .ctas .btn{justify-content:center;width:100%;padding-inline:10px;font-size:15.5px}}
+
+/* Tarifs */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.tarifs{display:grid;gap:18px;margin-top:24px;max-width:860px}
+.t-base{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.t-base div{background:var(--soft);border-radius:14px;padding:14px 16px;display:grid;gap:4px}
+.t-base span{font-size:14px;color:var(--ink-2)}.t-base b{font-size:20px}
+.t-list{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.t-list th,.t-list td{padding:13px 16px;border-bottom:1px solid var(--line);text-align:left;font-weight:500}
+.t-list thead th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:700;background:var(--paper)}
+.t-list td,.t-list thead th:last-child{text-align:right}.t-list td{font-weight:700;white-space:nowrap}
+.t-list tr:last-child th,.t-list tr:last-child td{border-bottom:0}
+.t-notes{list-style:none;padding:0;margin:0;display:grid;gap:6px;color:var(--ink-2);font-size:15px}
+.t-notes li{display:flex;gap:8px;align-items:flex-start}.t-notes svg{flex:none;margin-top:3px;color:var(--ok)}
+@media (max-width:760px){.t-base{grid-template-columns:1fr}.t-list th,.t-list td{padding:12px}.t-list td{white-space:normal;min-width:96px}}
+.t-urg div{background:color-mix(in srgb,#C0392B 8%,var(--card));border:1px solid color-mix(in srgb,#C0392B 25%,var(--line))}.t-urg b{color:#9B2C20}
+@media (max-width:760px){.t-base{gap:8px}.t-base div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px}.t-base span{font-size:14.5px}.t-base b{font-size:17px;white-space:nowrap}}</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Plumber", "name": "Artisan Plomberie Toulousaine 31", "url": "https://artisanplomberietoulousaine31.fr/", "telephone": "+33643024389", "address": {"@type": "PostalAddress", "streetAddress": "79 avenue de la Gloire", "postalCode": "31500", "addressLocality": "Toulouse", "addressRegion": "Occitanie", "addressCountry": "FR"}, "hasMap": "https://www.google.com/maps/search/?api=1&query=Artisan%20Plomberie%20Toulousaine%2031%2C%2079%20avenue%20de%20la%20Gloire%2C%2031500%20Toulouse", "priceRange": "55 € – 1 265 €", "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Tarifs", "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Diagnostic et dépannage simple"}, "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "EUR", "minPrice": 110, "maxPrice": 165, "valueAddedTaxIncluded": true}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Débouchage WC classique"}, "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "EUR", "minPrice": 165, "maxPrice": 242, "valueAddedTaxIncluded": true}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Débouchage au furet électrique"}, "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "EUR", "minPrice": 220, "maxPrice": 385, "valueAddedTaxIncluded": true}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Recherche de fuite non destructive"}, "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "EUR", "minPrice": 418, "maxPrice": 605, "valueAddedTaxIncluded": true}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Réparation de fuite apparente"}, "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "EUR", "minPrice": 165, "maxPrice": 308, "valueAddedTaxIncluded": true}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Remplacement d'un mitigeur"}, "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "EUR", "minPrice": 198, "maxPrice": 352, "valueAddedTaxIncluded": true}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Remplacement d'un mécanisme WC"}, "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "EUR", "minPrice": 165, "maxPrice": 286, "valueAddedTaxIncluded": true}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Remplacement chauffe-eau électrique 100 L"}, "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "EUR", "minPrice": 935, "maxPrice": 1265, "valueAddedTaxIncluded": true}}]}, "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "00:00", "closes": "23:59"}], "areaServed": [{"@type": "City", "name": "Toulouse"}, {"@type": "City", "name": "Balma"}, {"@type": "City", "name": "Blagnac"}, {"@type": "City", "name": "Tournefeuille"}, {"@type": "City", "name": "Ramonville-Saint-Agne"}, {"@type": "City", "name": "Cugnaux"}, {"@type": "City", "name": "Colomiers"}, {"@type": "City", "name": "L'Union"}, {"@type": "City", "name": "Saint-Orens"}], "sameAs": ["https://www.google.com/maps/search/?api=1&query=Artisan+Plomberie+Toulousaine+31&query_place_id=ChIJr3PrSh-7rhIRdEAPcxoRuCQ", "https://www.instagram.com/plomberie5723/", "https://www.tiktok.com/@artisanplomberie31", "https://www.facebook.com/people/Artisan-Plombier/100009741544636/"], "logo": "https://artisanplomberietoulousaine31.fr/icon-512.png", "image": "https://artisanplomberietoulousaine31.fr/logo-full.jpg"}</script>
 </head>
 <body class="has-mbar">
 <header class="top"><div class="wrap">
@@ -279,7 +296,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-bet
     <button class="photo-link" type="button" data-open-assistant data-photo><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ou envoyez une <b>photo du problème</b> : l'artisan la reçoit tout de suite</span></button>
     <div class="trust">
       <a class="t-rate" href="https://www.google.com/maps/search/?api=1&amp;query=Artisan+Plomberie+Toulousaine+31&amp;query_place_id=ChIJr3PrSh-7rhIRdEAPcxoRuCQ" target="_blank" rel="noopener"><span class="stars" aria-hidden="true">★★★★★</span><b>4,9/5</b> · 229 avis Google</a>
-      <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Garantie décennale AXA</span>
+      
       <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Devis gratuit</span>
       <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>7j/7</span>
     </div>
@@ -399,6 +416,22 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-bet
   </div>
 </div></section>
 
+
+<section id="tarifs"><div class="wrap">
+  <p class="eyebrow">Tarifs</p>
+  <h2>Les prix, avant même qu'il se déplace</h2>
+  <p class="lead">Pas de mauvaise surprise : voici les fourchettes de prix pratiquées. Le prix exact est fixé par un devis écrit, gratuit, avant toute intervention.</p>
+  <div class="tarifs">
+    <div class="t-base"><div><span>Main-d&#39;œuvre (taux horaire)</span><b>83 à 99 € / h</b></div><div><span>Déplacement Toulouse</span><b>55 à 66 €</b></div><div><span>Déplacement hors Toulouse</span><b>66 à 99 €</b></div></div>
+    <div class="t-base t-urg"><div><span>Déplacement en urgence le week-end</span><b>132 €</b></div><div><span>Déplacement en urgence la nuit</span><b>198 €</b></div><div><span>Urgence un jour férié (déplacement et diagnostic)</span><b>275 €</b></div></div>
+    <table class="t-list"><caption class="sr">Fourchettes de prix des prestations courantes</caption><thead><tr><th scope="col">Prestation</th><th scope="col">Prix indicatif</th></tr></thead><tbody>
+    <tr><th scope="row">Diagnostic et dépannage simple</th><td>110 à 165 €</td></tr><tr><th scope="row">Débouchage WC classique</th><td>165 à 242 €</td></tr><tr><th scope="row">Débouchage au furet électrique</th><td>220 à 385 €</td></tr><tr><th scope="row">Recherche de fuite non destructive</th><td>418 à 605 €</td></tr><tr><th scope="row">Réparation de fuite apparente</th><td>165 à 308 €</td></tr><tr><th scope="row">Remplacement d&#39;un mitigeur</th><td>198 à 352 €</td></tr><tr><th scope="row">Remplacement d&#39;un mécanisme WC</th><td>165 à 286 €</td></tr><tr><th scope="row">Remplacement chauffe-eau électrique 100 L</th><td>935 à 1 265 €</td></tr>
+    </tbody></table>
+    <ul class="t-notes"><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Prix TTC avec une TVA à 10 %, taux applicable aux travaux dans un logement de plus de 2 ans. Logement de moins de 2 ans : TVA à 20 %.</li><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Devis écrit et gratuit avant toute intervention : rien n&#39;est engagé sans votre accord.</li><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Tarifs mis à jour le 11 novembre 2026.</li></ul>
+    <div class="t-cta"><button class="btn write" type="button" data-open-assistant><img class="bava" src="assistante.jpg" alt="" width="34" height="34">Estimer mon prix avec l'assistante</button></div>
+  </div>
+</div></section>
+
 <section id="zone"><div class="wrap zone-grid">
   <div>
   <p class="eyebrow">Zone d'intervention</p>
@@ -432,16 +465,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-bet
   
   </div>
   <p style="margin-top:18px"><a href="https://www.google.com/maps/search/?api=1&amp;query=Artisan+Plomberie+Toulousaine+31&amp;query_place_id=ChIJr3PrSh-7rhIRdEAPcxoRuCQ" target="_blank" rel="noopener">Lire tous les avis sur Google</a></p>
-  <ul class="promises"><li>Devis gratuit et transparent</li><li>Diagnostic expliqué clairement</li><li>Chantier laissé propre</li><li>Suivi après intervention</li><li>Assuré en garantie décennale</li></ul>
+  <ul class="promises"><li>Devis gratuit et transparent</li><li>Diagnostic expliqué clairement</li><li>Chantier laissé propre</li><li>Suivi après intervention</li></ul>
 </div></section>
 
 <section id="faq"><div class="wrap">
   <p class="eyebrow">Questions fréquentes</p>
   <h2>Avant d'appeler</h2>
   <div class="faq">
-    <details><summary>Combien coûte une intervention ?</summary><p>Cela dépend du problème. L&#39;artisan fait un diagnostic et vous donne un prix clair avant de commencer. Le devis est gratuit.</p></details>
+    <details><summary>Combien coûte une intervention ?</summary><p>Les fourchettes de prix sont affichées dans la rubrique <a href="#tarifs">Tarifs</a> (par exemple, débouchage d'un WC : 165 à 242 €). L&#39;artisan fait un diagnostic et vous remet un devis écrit et gratuit avant de commencer.</p></details>
     <details><summary>Intervenez-vous le soir et le week-end ?</summary><p>Oui, l&#39;artisan intervient 7 jours sur 7. Pour une urgence, appelez directement, ou laissez votre demande à l'assistante : elle arrive en priorité.</p></details>
-    <details><summary>En combien de temps pouvez-vous venir ?</summary><p>En général en moins de 24 heures à Toulouse et alentours, souvent le jour même pour une urgence.</p></details>
+    <details><summary>En combien de temps pouvez-vous venir ?</summary><p>Après votre demande, l&#39;artisan vous rappelle sous 1 h, souvent en moins de 30 min. En général en moins de 24 heures à Toulouse et alentours, souvent le jour même pour une urgence.</p></details>
     <details><summary>Que faire en attendant en cas de fuite ?</summary><p>Coupez l'arrivée d'eau générale, souvent près du compteur, et l'électricité de la pièce si l'eau approche d'une prise. Puis appelez.</p></details>
   </div>
 </div></section>

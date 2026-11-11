@@ -245,7 +245,24 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-bet
 .bava{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:none;margin:-6px 2px -6px -8px;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #22A55B}
 .btn.write{display:inline-flex;align-items:center;gap:10px}
 .mbar .m-ava .bava{width:26px;height:26px;margin:0;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #22A55B}
-@media (max-width:760px){.contact .ctas{display:grid;grid-template-columns:1fr 1fr;gap:10px}.contact .ctas .btn{justify-content:center;width:100%;padding-inline:10px;font-size:15.5px}}</style>
+@media (max-width:760px){.contact .ctas{display:grid;grid-template-columns:1fr 1fr;gap:10px}.contact .ctas .btn{justify-content:center;width:100%;padding-inline:10px;font-size:15.5px}}
+
+/* Tarifs */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.tarifs{display:grid;gap:18px;margin-top:24px;max-width:860px}
+.t-base{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.t-base div{background:var(--soft);border-radius:14px;padding:14px 16px;display:grid;gap:4px}
+.t-base span{font-size:14px;color:var(--ink-2)}.t-base b{font-size:20px}
+.t-list{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.t-list th,.t-list td{padding:13px 16px;border-bottom:1px solid var(--line);text-align:left;font-weight:500}
+.t-list thead th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:700;background:var(--paper)}
+.t-list td,.t-list thead th:last-child{text-align:right}.t-list td{font-weight:700;white-space:nowrap}
+.t-list tr:last-child th,.t-list tr:last-child td{border-bottom:0}
+.t-notes{list-style:none;padding:0;margin:0;display:grid;gap:6px;color:var(--ink-2);font-size:15px}
+.t-notes li{display:flex;gap:8px;align-items:flex-start}.t-notes svg{flex:none;margin-top:3px;color:var(--ok)}
+@media (max-width:760px){.t-base{grid-template-columns:1fr}.t-list th,.t-list td{padding:12px}.t-list td{white-space:normal;min-width:96px}}
+.t-urg div{background:color-mix(in srgb,#C0392B 8%,var(--card));border:1px solid color-mix(in srgb,#C0392B 25%,var(--line))}.t-urg b{color:#9B2C20}
+@media (max-width:760px){.t-base{gap:8px}.t-base div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px}.t-base span{font-size:14.5px}.t-base b{font-size:17px;white-space:nowrap}}</style>
 </head>
 <body>
 <main><section><div class="wrap" style="max-width:640px">
